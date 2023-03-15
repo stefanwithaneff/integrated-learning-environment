@@ -1,0 +1,84 @@
+{
+  "name": "integrated-learning-environment",
+  "displayName": "Integrated Learning Environment",
+  "description": "",
+  "version": "0.0.1",
+  "engines": {
+    "vscode": "^1.51.0"
+  },
+  "categories": [
+    "Other"
+  ],
+  "activationEvents": [
+    "workspaceContains:LEARNME.toml"
+  ],
+  "main": "./dist/extension.js",
+  "contributes": {
+    "views": {
+      "explorer": [
+        {
+          "id": "integratedLearningEnvironment",
+          "name": "Integrated Learning Environment"
+        }
+      ]
+    },
+    "menus": {
+      "view/title": [
+        {
+          "command": "integratedLearningEnvironment.refreshData",
+          "when": "view == integratedLearningEnvironment",
+          "group": "navigation"
+        }
+      ],
+      "view/item/context": [
+        {
+          "command": "integratedLearningEnvironment.viewCourseItem",
+          "when": "view == integratedLearningEnvironment",
+          "group": "inline"
+        }
+      ]
+    },
+    "commands": [
+      {
+        "command": "integratedLearningEnvironment.refreshData",
+        "title": "Refresh",
+        "icon": "$(refresh)"
+      },
+      {
+        "command": "integratedLearningEnvironment.viewCourseItem",
+        "title": "View Course Item",
+        "icon": "$(link-external)"
+      }
+    ]
+  },
+  "scripts": {
+    "vscode:prepublish": "npm run package",
+    "compile": "webpack --devtool nosources-source-map --config ./build/node-extension.webpack.config.js",
+    "watch": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/node-extension.webpack.config.js",
+    "package": "webpack --mode production --config ./build/node-extension.webpack.config.js",
+    "test-compile": "tsc -p ./",
+    "test-watch": "tsc -watch -p ./",
+    "pretest": "npm run test-compile && npm run lint",
+    "lint": "eslint src --ext ts",
+    "test": "node ./out/test/runTest.js"
+  },
+  "devDependencies": {
+    "@types/vscode": "^1.51.0",
+    "@types/glob": "^7.1.3",
+    "@types/mocha": "^8.0.0",
+    "@types/node": "^12.11.7",
+    "eslint": "^7.9.0",
+    "@typescript-eslint/eslint-plugin": "^4.1.1",
+    "@typescript-eslint/parser": "^4.1.1",
+    "glob": "^7.1.6",
+    "mocha": "^8.1.3",
+    "typescript": "^4.0.2",
+    "vscode-test": "^1.4.0",
+    "ts-loader": "^8.0.3",
+    "webpack": "^4.44.1",
+    "webpack-cli": "^3.3.12"
+  },
+  "dependencies": {
+    "@iarna/toml": "^2.2.5"
+  }
+}
