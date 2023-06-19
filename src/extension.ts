@@ -21,8 +21,16 @@ export function activate(context: vscode.ExtensionContext) {
     "integratedLearningEnvironment",
     {
       treeDataProvider: courseDataProvider,
+      canSelectMany: false,
     }
   );
+
+  treeView.onDidChangeSelection((event) => {
+    if (event.selection.length === 0) {
+      return;
+    }
+    viewLessonContentCommand(event.selection[0]);
+  });
 
   const refreshCommand = vscode.commands.registerCommand(
     "integratedLearningEnvironment.refreshData",
