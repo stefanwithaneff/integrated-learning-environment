@@ -3,8 +3,6 @@ import * as util from "util";
 import * as vscode from "vscode";
 import * as toml from "@iarna/toml";
 import { LEARNME_FILENAME } from "./constants";
-import { LessonViewProvider } from "./lesson-view-provider";
-import { viewLessonContentCommandFactory } from "./commands/view-lesson-content";
 
 export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<
@@ -38,7 +36,7 @@ export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
       const items: CourseItem[] = [];
       for (const module of element.data.modules) {
         if (module.type === "lesson") {
-          items.push(new CourseLesson(module));
+          items.push(new CourseLesson(element.configUri, module));
         } else if (module.type === "submodule") {
           const submoduleUri = vscode.Uri.joinPath(
             element.configUri,
@@ -106,7 +104,7 @@ interface CourseModule {
 export class CourseItem extends vscode.TreeItem {}
 
 export class CourseLesson extends CourseItem {
-  constructor(public data: LessonConfig) {
+  constructor(public configUri: vscode.Uri, public data: LessonConfig) {
     super(data.title, vscode.TreeItemCollapsibleState.None);
   }
 }
