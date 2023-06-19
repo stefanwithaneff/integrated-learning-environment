@@ -8,7 +8,7 @@ export class LessonViewProvider {
     this.webviewPanel = vscode.window.createWebviewPanel(
       EXTENSION_NAMESPACE,
       "Integrated Learning Environment",
-      vscode.ViewColumn.Active
+      vscode.ViewColumn.Two
     );
 
     this.webviewPanel.onDidDispose(() => {

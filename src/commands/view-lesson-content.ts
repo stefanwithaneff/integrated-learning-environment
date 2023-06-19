@@ -7,6 +7,7 @@ import {
   CourseSubmodule,
 } from "../course-data-provider";
 import { LessonViewProvider } from "../lesson-view-provider";
+import { getContentRelativeToConfig } from "../utils/fs";
 
 const markdownRenderer = new MarkdownIt();
 
@@ -18,16 +19,13 @@ export const viewLessonContentCommandFactory = (
 
     if (item instanceof CourseLesson) {
       // Load the lesson content from file
-      const contentUri = vscode.Uri.joinPath(
+      const { content } = await getContentRelativeToConfig(
         item.configUri,
-        "..",
         item.data.contentPath
       );
-      const lessonContent = await vscode.workspace.fs.readFile(contentUri);
-      const contentString = new util.TextDecoder("utf-8").decode(lessonContent);
 
       if (item.data.contentType === "markdown") {
-        const html = markdownRenderer.render(contentString);
+        const html = markdownRenderer.render(content);
 
         lessonView.title = item.data.title;
         lessonView.webview.html = html;

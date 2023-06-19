@@ -3,6 +3,11 @@ import * as util from "util";
 import * as vscode from "vscode";
 import * as toml from "@iarna/toml";
 import { LEARNME_FILENAME } from "./constants";
+import {
+  getContentRelativeToConfig,
+  getContentForUri,
+  getUriRelativeToConfig,
+} from "./utils/fs";
 
 export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<
@@ -38,12 +43,10 @@ export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
         if (module.type === "lesson") {
           items.push(new CourseLesson(element.configUri, module));
         } else if (module.type === "submodule") {
-          const submoduleUri = vscode.Uri.joinPath(
+          const { config, uri } = await this.getConfigForModule(
             element.configUri,
-            "..",
-            module.path
+            module
           );
-          const { config, uri } = await this.getConfigForModule(submoduleUri);
           items.push(new CourseSubmodule(uri, config));
         }
       }
@@ -57,14 +60,16 @@ export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
   }
 
   private async getConfigForModule(
-    uri: vscode.Uri
+    parentUri: vscode.Uri,
+    module?: SubmoduleConfig
   ): Promise<{ config: CourseModule; uri: vscode.Uri }> {
-    const configUri = vscode.Uri.joinPath(uri, LEARNME_FILENAME);
+    const uri = module
+      ? getUriRelativeToConfig(parentUri, module.path, LEARNME_FILENAME)
+      : vscode.Uri.joinPath(parentUri, LEARNME_FILENAME);
     try {
-      const configContents = await vscode.workspace.fs.readFile(configUri);
-      const configStr = new util.TextDecoder("utf-8").decode(configContents);
-      const config = toml.parse(configStr) as any;
-      return { config, uri: configUri };
+      const content = await getContentForUri(uri);
+      const config = toml.parse(content) as any;
+      return { config, uri };
     } catch (e) {
       console.error(e);
       throw e;
