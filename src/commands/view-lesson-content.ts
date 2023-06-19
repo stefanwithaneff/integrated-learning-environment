@@ -7,7 +7,10 @@ import {
   CourseSubmodule,
 } from "../course-data-provider";
 import { LessonViewProvider } from "../lesson-view-provider";
-import { getContentRelativeToConfig } from "../utils/fs";
+import {
+  getContentRelativeToConfig,
+  getUriRelativeToConfig,
+} from "../utils/fs";
 
 const markdownRenderer = new MarkdownIt();
 
@@ -29,6 +32,17 @@ export const viewLessonContentCommandFactory = (
 
         lessonView.title = item.data.title;
         lessonView.webview.html = html;
+      }
+
+      // Open exercise files
+      for (const path of item.data.exerciseFilePaths) {
+        const textDocument = await vscode.workspace.openTextDocument(
+          getUriRelativeToConfig(item.configUri, path)
+        );
+        await vscode.window.showTextDocument(textDocument, {
+          preview: false, // Prevents the individual files from overriding each other
+          viewColumn: vscode.ViewColumn.One,
+        });
       }
     }
 

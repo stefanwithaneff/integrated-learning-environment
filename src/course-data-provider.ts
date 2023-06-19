@@ -95,7 +95,7 @@ export interface LessonConfig {
   title: string;
   contentType: string;
   contentPath: string;
-  exerciseFilePaths: string;
+  exerciseFilePaths: string[];
   testFilter: string;
 }
 
