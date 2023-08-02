@@ -4,7 +4,6 @@ import * as vscode from "vscode";
 
 import { CourseDataProvider, CourseItem } from "./course-data-provider";
 import { LessonViewProvider } from "./lesson-view-provider";
-import { viewLessonContentCommandFactory } from "./commands/view-lesson-content";
 import { LessonRenderer } from "./lesson-renderer";
 
 // this method is called when your extension is activated

@@ -1,11 +1,7 @@
 import * as vscode from "vscode";
 import * as toml from "@iarna/toml";
 import { LEARNME_FILENAME } from "./constants";
-import {
-  getContentRelativeToConfig,
-  getContentForUri,
-  getUriRelativeToConfig,
-} from "./utils/fs";
+import { getContentForUri, getUriRelativeToConfig } from "./utils/fs";
 
 export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<
