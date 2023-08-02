@@ -1,5 +1,3 @@
-import * as util from "util";
-
 import * as vscode from "vscode";
 import * as toml from "@iarna/toml";
 import { LEARNME_FILENAME } from "./constants";

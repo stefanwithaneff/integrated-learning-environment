@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 import { CourseDataProvider, CourseItem } from "./course-data-provider";
 import { LessonViewProvider } from "./lesson-view-provider";
 import { viewLessonContentCommandFactory } from "./commands/view-lesson-content";
+import { LessonRenderer } from "./lesson-renderer";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -14,8 +15,9 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   const lessonViewProvider = new LessonViewProvider();
-  const viewLessonContentCommand =
-    viewLessonContentCommandFactory(lessonViewProvider);
+  const lessonRenderer = new LessonRenderer(lessonViewProvider);
+  const viewLessonContentCommand = (item: CourseItem) =>
+    lessonRenderer.viewLessonContent(item);
 
   const treeView = vscode.window.createTreeView(
     "integratedLearningEnvironment",

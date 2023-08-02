@@ -17,25 +17,43 @@ const markdownRenderer = new MarkdownIt();
 export const viewLessonContentCommandFactory = (
   viewProvider: LessonViewProvider
 ) => {
+  function getAllOpenTabs() {
+    return vscode.window.tabGroups.all.map((tabGroup) => tabGroup.tabs).flat();
+  }
+
+  async function clearView() {
+    const openTabs = getAllOpenTabs();
+
+    for (const tab of openTabs) {
+      if (tab.input) {
+        console.log((tab.input as any).constructor.name);
+      }
+    }
+  }
+
   return async function viewLessonContent(item: CourseItem) {
     const lessonView = viewProvider.getLessonView();
 
     if (item instanceof CourseLesson) {
+      clearView();
+
       // Load the lesson content from file
-      const { content } = await getContentRelativeToConfig(
-        item.configUri,
-        item.data.contentPath
-      );
+      if (item.data.contentPath) {
+        const { content } = await getContentRelativeToConfig(
+          item.configUri,
+          item.data.contentPath
+        );
 
-      if (item.data.contentType === "markdown") {
-        const html = markdownRenderer.render(content);
+        if (item.data.contentType === "markdown") {
+          const html = markdownRenderer.render(content);
 
-        lessonView.title = item.data.title;
-        lessonView.webview.html = html;
+          lessonView.title = item.data.title;
+          lessonView.webview.html = html;
+        }
       }
 
       // Open exercise files
-      for (const path of item.data.exerciseFilePaths) {
+      for (const path of item.data.exerciseFilePaths ?? []) {
         const textDocument = await vscode.workspace.openTextDocument(
           getUriRelativeToConfig(item.configUri, path)
         );

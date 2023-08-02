@@ -4,7 +4,7 @@
   "description": "",
   "version": "0.0.1",
   "engines": {
-    "vscode": "^1.51.0"
+    "vscode": "^1.67.0"
   },
   "categories": [
     "Other"
@@ -67,7 +67,7 @@
     "@types/markdown-it": "^12.2.3",
     "@types/mocha": "^8.0.0",
     "@types/node": "^12.11.7",
-    "@types/vscode": "^1.51.0",
+    "@types/vscode": "^1.80.0",
     "@typescript-eslint/eslint-plugin": "^4.1.1",
     "@typescript-eslint/parser": "^4.1.1",
     "eslint": "^7.9.0",

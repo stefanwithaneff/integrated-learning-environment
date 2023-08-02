@@ -36,3 +36,17 @@ export async function getContentRelativeToConfig(
 
   return { content, uri };
 }
+
+export async function saveAllOpenTextDocuments(): Promise<void> {
+  const dirtyDocuments = vscode.workspace.textDocuments.filter(
+    (doc) => doc.isDirty && !doc.isClosed
+  );
+
+  for (const doc of dirtyDocuments) {
+    const result = await doc.save();
+
+    if (!result) {
+      throw new Error(`Failed to save text document: ${doc.uri}`);
+    }
+  }
+}
