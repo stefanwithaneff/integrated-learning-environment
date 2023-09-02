@@ -38,12 +38,12 @@ export class LessonRenderer {
     return vscode.window.tabGroups.all.map((tabGroup) => tabGroup.tabs).flat();
   }
 
-  private hasExerciseFiles(item: CourseItem): item is CourseLesson {
-    return (
-      item instanceof CourseLesson &&
-      item.data.exerciseFilePaths &&
-      item.data.exerciseFilePaths.length > 0
-    );
+  private getExerciseFilePaths(item: CourseItem): string[] {
+    if (item instanceof CourseLesson && item.data.exerciseFilePaths) {
+      return item.data.exerciseFilePaths;
+    }
+
+    return [];
   }
 
   private async openExerciseFile(
@@ -72,12 +72,12 @@ export class LessonRenderer {
   private async openExerciseFiles(
     item: CourseItem
   ): Promise<vscode.TextDocument[]> {
-    if (!this.hasExerciseFiles(item)) {
+    if (!(item instanceof CourseLesson)) {
       return [];
     }
 
     return Promise.all(
-      item.data.exerciseFilePaths.map((path) =>
+      this.getExerciseFilePaths(item).map((path) =>
         this.openExerciseFile(item, path)
       )
     );
@@ -126,7 +126,7 @@ export class LessonRenderer {
   private openLessonView(item: CourseItem) {
     const lessonView = this.lessonViewProvider.getLessonView();
 
-    if (!this.hasExerciseFiles(item)) {
+    if (this.getExerciseFilePaths(item).length === 0) {
       lessonView.reveal(vscode.ViewColumn.One);
     } else {
       lessonView.reveal(vscode.ViewColumn.Two);
@@ -170,7 +170,7 @@ export class LessonRenderer {
   }
 
   private async focusOnPrimaryLessonContent(item: CourseItem) {
-    if (this.hasExerciseFiles(item)) {
+    if (this.getExerciseFilePaths(item).length > 0) {
       await this.openExerciseFileWithTextDocument(
         this.currentCourseItemTextDocuments[0]
       );

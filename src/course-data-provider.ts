@@ -35,18 +35,22 @@ export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
       const items: CourseItem[] = [];
       for (const module of element.data.modules) {
         if (module.type === "lesson") {
-          items.push(new CourseLesson(element.configUri, module));
+          items.push(new CourseLesson(element.configUri, module, element));
         } else if (module.type === "submodule") {
           const { config, uri } = await this.getConfigForModule(
             element.configUri,
             module
           );
-          items.push(new CourseSubmodule(uri, config));
+          items.push(new CourseSubmodule(uri, config, element));
         }
       }
       return items;
     }
     return [];
+  }
+
+  getParent(element: CourseItem): CourseItem | undefined {
+    return element.parent;
   }
 
   refresh(): void {
@@ -89,8 +93,9 @@ export interface LessonConfig {
   title: string;
   contentType: string;
   contentPath: string;
-  exerciseFilePaths: string[];
-  testFilter: string;
+  exerciseFilePaths?: string[];
+  testFilePaths?: string[];
+  testOutputPath?: string;
 }
 
 type ElementConfig = LessonConfig | SubmoduleConfig;
@@ -98,18 +103,37 @@ type ElementConfig = LessonConfig | SubmoduleConfig;
 interface CourseModule {
   title: string;
   modules: ElementConfig[];
+  testCommand?: string;
 }
 
-export class CourseItem extends vscode.TreeItem {}
+export abstract class CourseItem extends vscode.TreeItem {
+  public parent?: CourseItem;
+
+  constructor(
+    public configUri: vscode.Uri,
+    label: string,
+    collapsibleState: vscode.TreeItemCollapsibleState
+  ) {
+    super(label, collapsibleState);
+  }
+}
 
 export class CourseLesson extends CourseItem {
-  constructor(public configUri: vscode.Uri, public data: LessonConfig) {
-    super(data.title, vscode.TreeItemCollapsibleState.None);
+  constructor(
+    public configUri: vscode.Uri,
+    public data: LessonConfig,
+    public parent: CourseItem
+  ) {
+    super(configUri, data.title, vscode.TreeItemCollapsibleState.None);
   }
 }
 
 export class CourseSubmodule extends CourseItem {
-  constructor(public configUri: vscode.Uri, public data: CourseModule) {
-    super(data.title, vscode.TreeItemCollapsibleState.Collapsed);
+  constructor(
+    public configUri: vscode.Uri,
+    public data: CourseModule,
+    public parent?: CourseItem
+  ) {
+    super(configUri, data.title, vscode.TreeItemCollapsibleState.Collapsed);
   }
 }

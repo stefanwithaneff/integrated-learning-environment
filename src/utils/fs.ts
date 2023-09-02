@@ -1,5 +1,6 @@
 import * as util from "util";
 import * as vscode from "vscode";
+import { CourseItem } from "../course-data-provider";
 
 const decoder = new util.TextDecoder("utf-8");
 
@@ -49,4 +50,11 @@ export async function saveAllOpenTextDocuments(): Promise<void> {
       throw new Error(`Failed to save text document: ${doc.uri}`);
     }
   }
+}
+
+export function getRootDirectoryForCourseItem(item: CourseItem): vscode.Uri {
+  if (!item.parent) {
+    return vscode.Uri.joinPath(item.configUri, "..");
+  }
+  return getRootDirectoryForCourseItem(item.parent);
 }

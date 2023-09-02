@@ -5,6 +5,7 @@ import * as vscode from "vscode";
 import { CourseDataProvider, CourseItem } from "./course-data-provider";
 import { LessonViewProvider } from "./lesson-view-provider";
 import { LessonRenderer } from "./lesson-renderer";
+import { runTestsForCourseItem } from "./run-tests-for-course-item";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -15,8 +16,6 @@ export function activate(context: vscode.ExtensionContext) {
 
   const lessonViewProvider = new LessonViewProvider();
   const lessonRenderer = new LessonRenderer(lessonViewProvider);
-  const viewLessonContentCommand = (item: CourseItem) =>
-    lessonRenderer.viewLessonContent(item);
 
   const treeView = vscode.window.createTreeView(
     "integratedLearningEnvironment",
@@ -30,7 +29,7 @@ export function activate(context: vscode.ExtensionContext) {
     if (event.selection.length === 0) {
       return;
     }
-    viewLessonContentCommand(event.selection[0]);
+    lessonRenderer.viewLessonContent(event.selection[0]);
   });
 
   const refreshCommand = vscode.commands.registerCommand(
@@ -41,11 +40,26 @@ export function activate(context: vscode.ExtensionContext) {
   const viewCourseItemCommand = vscode.commands.registerCommand(
     "integratedLearningEnvironment.viewCourseItem",
     (item: CourseItem) => {
-      viewLessonContentCommand(item);
+      lessonRenderer.viewLessonContent(item);
     }
   );
 
-  context.subscriptions.push(refreshCommand, viewCourseItemCommand);
+  const runCourseItemTestsCommand = vscode.commands.registerCommand(
+    "integratedLearningEnvironment.runCourseItemTests",
+    async () => {
+      const currentCourseItem = treeView.selection[0];
+      await runTestsForCourseItem(context, currentCourseItem);
+
+      // Refresh course data provider to pick up new test status
+      courseDataProvider.refresh();
+    }
+  );
+
+  context.subscriptions.push(
+    refreshCommand,
+    viewCourseItemCommand,
+    runCourseItemTestsCommand
+  );
 }
 
 // this method is called when your extension is deactivated
