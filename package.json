@@ -59,7 +59,7 @@
   "scripts": {
     "vscode:prepublish": "npm run package",
     "compile": "webpack --devtool nosources-source-map --config ./build/node-extension.webpack.config.js",
-    "watch": "webpack --watch --devtool nosources-source-map --info-verbosity verbose --config ./build/node-extension.webpack.config.js",
+    "watch": "webpack --watch --devtool nosources-source-map --config ./build/node-extension.webpack.config.js",
     "package": "webpack --mode production --config ./build/node-extension.webpack.config.js",
     "test-compile": "tsc -p ./",
     "test-watch": "tsc -watch -p ./",
@@ -85,6 +85,7 @@
   },
   "dependencies": {
     "@iarna/toml": "^2.2.5",
+    "handlebars": "^4.7.8",
     "markdown-it": "^13.0.1",
     "mocha": "^10.2.0",
     "tap-parser": "^13.0.2-1"

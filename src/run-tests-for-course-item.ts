@@ -11,19 +11,31 @@ import {
 import * as childProcess from "child_process";
 import * as vscode from "vscode";
 import { Parser } from "tap-parser";
+import { renderTemplate } from "./template-renderer";
 
-function getTestCommand(courseItem: CourseItem): string | undefined {
+function getTestCommand(
+  context: vscode.ExtensionContext,
+  courseItem: CourseItem
+): string {
   if (courseItem instanceof CourseSubmodule) {
     if (!courseItem.data.testCommand) {
       if (!courseItem.parent) {
-        return;
+        return getDefaultTestCommand(context);
       }
-      return getTestCommand(courseItem.parent);
+      return getTestCommand(context, courseItem.parent);
     }
     return courseItem.data.testCommand;
   } else if (courseItem instanceof CourseLesson) {
-    return getTestCommand(courseItem.parent);
+    return getTestCommand(context, courseItem.parent);
   }
+
+  return getDefaultTestCommand(context);
+}
+
+function getDefaultTestCommand(context: vscode.ExtensionContext): string {
+  return `${context.asAbsolutePath(
+    "./node_modules/.bin/mocha"
+  )} --reporter=tap {{join filePaths ' '}} > {{outputPath}}`;
 }
 
 export async function runTestsForCourseItem(
@@ -35,37 +47,38 @@ export async function runTestsForCourseItem(
     courseItem.data.testFilePaths &&
     courseItem.data.testFilePaths.length > 0
   ) {
-    const testCommand = getTestCommand(courseItem);
-    if (!testCommand) {
-      const outputDirectory = getUriRelativeToConfig(
-        courseItem.configUri,
-        courseItem.data.testOutputPath ?? "./__test_output__/"
-      );
+    const testCommand = getTestCommand(context, courseItem);
 
-      await vscode.workspace.fs.createDirectory(outputDirectory);
+    const outputDirectory = getUriRelativeToConfig(
+      courseItem.configUri,
+      courseItem.data.testOutputDirectory ?? "./__test_output__/"
+    );
 
-      const outputUri = vscode.Uri.joinPath(outputDirectory, "./results.tap");
+    await vscode.workspace.fs.createDirectory(outputDirectory);
 
-      const filePaths = courseItem.data.testFilePaths.map(
-        (path) => getUriRelativeToConfig(courseItem.configUri, path).fsPath
-      );
+    const outputUri = vscode.Uri.joinPath(outputDirectory, "./results.tap");
 
-      try {
-        childProcess.execSync(
-          `${context.asAbsolutePath(
-            "./node_modules/.bin/mocha"
-          )} --reporter=tap ${filePaths.join(" ")} > ${outputUri.fsPath}`,
-          { cwd: getRootDirectoryForCourseItem(courseItem).fsPath }
-        );
-      } catch (e: any) {
-        if (!e.output) {
-          throw new Error(`Error running test command: ${e.message}`);
-        }
+    const filePaths = courseItem.data.testFilePaths.map(
+      (path) => getUriRelativeToConfig(courseItem.configUri, path).fsPath
+    );
+
+    const renderedCommand = renderTemplate(testCommand, {
+      filePaths,
+      outputPath: outputUri.fsPath,
+    });
+
+    try {
+      const buffer = childProcess.execSync(renderedCommand, {
+        cwd: getRootDirectoryForCourseItem(courseItem).fsPath,
+      });
+    } catch (e: any) {
+      if (!e.output) {
+        throw new Error(`Error running test command: ${e.message}`);
       }
-
-      const tapOutput = await getContentForUri(outputUri);
-      const testResults = Parser.parse(tapOutput);
-      console.log(JSON.stringify(testResults, null, 2));
     }
+
+    const tapOutput = await getContentForUri(outputUri);
+    const testResults = Parser.parse(tapOutput);
+    console.log("Test output >>>", JSON.stringify(testResults, null, 2));
   }
 }

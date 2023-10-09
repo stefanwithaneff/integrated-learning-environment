@@ -95,7 +95,7 @@ export interface LessonConfig {
   contentPath: string;
   exerciseFilePaths?: string[];
   testFilePaths?: string[];
-  testOutputPath?: string;
+  testOutputDirectory?: string;
 }
 
 type ElementConfig = LessonConfig | SubmoduleConfig;
