@@ -42,7 +42,9 @@ export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
       const items: CourseItem[] = [];
       for (const module of element.data.modules) {
         if (module.type === "lesson") {
-          items.push(new CourseLesson(element.configUri, module, element));
+          const lesson = new CourseLesson(element.configUri, module, element);
+          await lesson.loadLessonStatus();
+          items.push(lesson);
         } else if (module.type === "submodule") {
           const { config, uri } = await this.getConfigForModule(
             element.configUri,

@@ -1,4 +1,5 @@
 import * as vscode from "vscode";
+import { getResultsFromTapOutput, TestOutput } from "./tap-parser";
 
 export interface SubmoduleConfig {
   type: "submodule";
@@ -37,13 +38,46 @@ export abstract class CourseItem extends vscode.TreeItem {
   }
 }
 
+enum LessonStatus {
+  EMPTY = "EMPTY",
+  ERROR = "ERROR",
+  PASSED = "PASSED",
+}
+
+const iconForStatus: Record<LessonStatus, vscode.ThemeIcon> = {
+  [LessonStatus.EMPTY]: new vscode.ThemeIcon("circle-large-outline"),
+  [LessonStatus.ERROR]: new vscode.ThemeIcon("stop"),
+  [LessonStatus.PASSED]: new vscode.ThemeIcon("pass-filled"),
+};
+
 export class CourseLesson extends CourseItem {
+  testResults?: TestOutput[];
+  lessonStatus: LessonStatus = LessonStatus.EMPTY;
   constructor(
     public configUri: vscode.Uri,
     public data: LessonConfig,
     public parent: CourseItem
   ) {
     super(configUri, data.title, vscode.TreeItemCollapsibleState.None);
+  }
+
+  async loadLessonStatus() {
+    const assertions = await getResultsFromTapOutput(this);
+    this.testResults = assertions;
+
+    if (assertions.length === 0) {
+      this.lessonStatus = LessonStatus.EMPTY;
+    } else if (assertions.every((assertion) => assertion.succeeded)) {
+      this.lessonStatus = LessonStatus.PASSED;
+    } else {
+      this.lessonStatus = LessonStatus.ERROR;
+    }
+
+    this.setIconForLessonStatus();
+  }
+
+  setIconForLessonStatus() {
+    this.iconPath = iconForStatus[this.lessonStatus];
   }
 }
 
