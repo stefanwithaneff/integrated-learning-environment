@@ -1,10 +1,6 @@
 import * as MarkdownIt from "markdown-it";
 import * as vscode from "vscode";
-import {
-  CourseItem,
-  CourseLesson,
-  CourseSubmodule,
-} from "./course-data-provider";
+import { CourseItem, CourseLesson, CourseSubmodule } from "./course-data";
 import { LessonViewProvider } from "./lesson-view-provider";
 import {
   getContentRelativeToConfig,

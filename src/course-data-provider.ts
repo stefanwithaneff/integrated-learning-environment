@@ -2,6 +2,13 @@ import * as vscode from "vscode";
 import * as toml from "@iarna/toml";
 import { LEARNME_FILENAME } from "./constants";
 import { getContentForUri, getUriRelativeToConfig } from "./utils/fs";
+import {
+  CourseItem,
+  CourseLesson,
+  CourseSubmodule,
+  SubmoduleConfig,
+  CourseModule,
+} from "./course-data";
 
 export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
   private _onDidChangeTreeData: vscode.EventEmitter<
@@ -79,61 +86,5 @@ export class CourseDataProvider implements vscode.TreeDataProvider<CourseItem> {
     config: CourseModule
   ): CourseSubmodule {
     return new CourseSubmodule(uri, config);
-  }
-}
-
-export interface SubmoduleConfig {
-  type: "submodule";
-  title: string;
-  path: string;
-}
-
-export interface LessonConfig {
-  type: "lesson";
-  title: string;
-  contentType: string;
-  contentPath: string;
-  exerciseFilePaths?: string[];
-  testFilePaths?: string[];
-  testOutputDirectory?: string;
-}
-
-type ElementConfig = LessonConfig | SubmoduleConfig;
-
-interface CourseModule {
-  title: string;
-  modules: ElementConfig[];
-  testCommand?: string;
-}
-
-export abstract class CourseItem extends vscode.TreeItem {
-  public parent?: CourseItem;
-
-  constructor(
-    public configUri: vscode.Uri,
-    label: string,
-    collapsibleState: vscode.TreeItemCollapsibleState
-  ) {
-    super(label, collapsibleState);
-  }
-}
-
-export class CourseLesson extends CourseItem {
-  constructor(
-    public configUri: vscode.Uri,
-    public data: LessonConfig,
-    public parent: CourseItem
-  ) {
-    super(configUri, data.title, vscode.TreeItemCollapsibleState.None);
-  }
-}
-
-export class CourseSubmodule extends CourseItem {
-  constructor(
-    public configUri: vscode.Uri,
-    public data: CourseModule,
-    public parent?: CourseItem
-  ) {
-    super(configUri, data.title, vscode.TreeItemCollapsibleState.Collapsed);
   }
 }

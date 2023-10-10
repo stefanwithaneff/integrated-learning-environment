@@ -2,7 +2,8 @@
 // Import the module and reference it with the alias vscode in your code below
 import * as vscode from "vscode";
 
-import { CourseDataProvider, CourseItem } from "./course-data-provider";
+import { CourseDataProvider } from "./course-data-provider";
+import { CourseItem } from "./course-data";
 import { LessonViewProvider } from "./lesson-view-provider";
 import { LessonRenderer } from "./lesson-renderer";
 import { runTestsForCourseItem } from "./run-tests-for-course-item";

@@ -1,6 +1,6 @@
 import * as util from "util";
 import * as vscode from "vscode";
-import { CourseItem } from "../course-data-provider";
+import { CourseItem } from "../course-data";
 
 const decoder = new util.TextDecoder("utf-8");
 

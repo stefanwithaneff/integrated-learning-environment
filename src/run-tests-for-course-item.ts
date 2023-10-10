@@ -1,8 +1,4 @@
-import {
-  CourseItem,
-  CourseLesson,
-  CourseSubmodule,
-} from "./course-data-provider";
+import { CourseItem, CourseLesson, CourseSubmodule } from "./course-data";
 import {
   getContentForUri,
   getRootDirectoryForCourseItem,
