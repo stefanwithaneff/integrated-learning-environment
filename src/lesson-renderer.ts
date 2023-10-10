@@ -4,7 +4,7 @@ import { CourseItem, CourseLesson, CourseSubmodule } from "./course-data";
 import { LessonViewProvider } from "./lesson-view-provider";
 import {
   getContentRelativeToConfig,
-  getUriRelativeToConfig,
+  getUriRelativeToCourseItem,
   saveAllOpenTextDocuments,
 } from "./utils/fs";
 
@@ -47,7 +47,7 @@ export class LessonRenderer {
     path: string
   ): Promise<vscode.TextDocument> {
     const textDocument = await vscode.workspace.openTextDocument(
-      getUriRelativeToConfig(item.configUri, path)
+      getUriRelativeToCourseItem(item, path)
     );
 
     await this.openExerciseFileWithTextDocument(textDocument);

@@ -2,7 +2,7 @@ import { CourseItem, CourseLesson, CourseSubmodule } from "./course-data";
 import {
   getContentForUri,
   getRootDirectoryForCourseItem,
-  getUriRelativeToConfig,
+  getUriRelativeToCourseItem,
 } from "./utils/fs";
 import * as childProcess from "child_process";
 import * as vscode from "vscode";
@@ -45,8 +45,8 @@ export async function runTestsForCourseItem(
   ) {
     const testCommand = getTestCommand(context, courseItem);
 
-    const outputDirectory = getUriRelativeToConfig(
-      courseItem.configUri,
+    const outputDirectory = getUriRelativeToCourseItem(
+      courseItem,
       courseItem.data.testOutputDirectory ?? "./__test_output__/"
     );
 
@@ -55,7 +55,7 @@ export async function runTestsForCourseItem(
     const outputUri = vscode.Uri.joinPath(outputDirectory, "./results.tap");
 
     const filePaths = courseItem.data.testFilePaths.map(
-      (path) => getUriRelativeToConfig(courseItem.configUri, path).fsPath
+      (path) => getUriRelativeToCourseItem(courseItem, path).fsPath
     );
 
     const renderedCommand = renderTemplate(testCommand, {
