@@ -8,7 +8,8 @@ export class LessonViewProvider {
     this.webviewPanel = vscode.window.createWebviewPanel(
       EXTENSION_NAMESPACE,
       "Integrated Learning Environment",
-      vscode.ViewColumn.Two
+      vscode.ViewColumn.Two,
+      { enableScripts: true, enableCommandUris: true }
     );
 
     this.webviewPanel.onDidDispose(() => {

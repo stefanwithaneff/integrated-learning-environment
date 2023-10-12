@@ -136,6 +136,14 @@ export class LessonRenderer {
       const html = `
         <html>
           <body>
+            <nav>
+              <a id="prev" href="${vscode.Uri.parse(
+                "command:integratedLearningEnvironment.goToPreviousCourseItem"
+              )}">Back</a>
+              <a id="next" href="${vscode.Uri.parse(
+                "command:integratedLearningEnvironment.goToNextCourseItem"
+              )}">Next</a>
+            </nav>
             <h1>${item.data.title}</h1>
             <ol>
               ${item.data.modules
@@ -156,7 +164,21 @@ export class LessonRenderer {
         );
 
         if (item.data.contentType === "markdown") {
-          const html = markdownRenderer.render(content);
+          const html = `
+            <html>
+              <body>
+                <nav>
+                  <a id="prev" href="${vscode.Uri.parse(
+                    "command:integratedLearningEnvironment.goToPreviousCourseItem"
+                  )}">Back</a>
+                  <a id="next" href="${vscode.Uri.parse(
+                    "command:integratedLearningEnvironment.goToNextCourseItem"
+                  )}">Next</a>
+                </nav>
+                ${markdownRenderer.render(content)}
+              </body>
+            </html>
+          `;
 
           lessonView.title = item.data.title;
           lessonView.webview.html = html;
