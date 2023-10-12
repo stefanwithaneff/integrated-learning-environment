@@ -12,6 +12,8 @@ export interface LessonConfig {
   title: string;
   contentType: string;
   contentPath: string;
+  contentScripts?: string[];
+  contentStyles?: string[];
   exerciseFilePaths?: string[];
   testFilePaths?: string[];
   testOutputDirectory?: string;

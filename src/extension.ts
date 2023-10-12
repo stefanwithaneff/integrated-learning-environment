@@ -22,7 +22,7 @@ export function activate(context: vscode.ExtensionContext) {
   );
 
   const lessonViewProvider = new LessonViewProvider();
-  const lessonRenderer = new LessonRenderer(lessonViewProvider);
+  const lessonRenderer = new LessonRenderer(lessonViewProvider, context);
 
   const treeView = vscode.window.createTreeView(
     "integratedLearningEnvironment",

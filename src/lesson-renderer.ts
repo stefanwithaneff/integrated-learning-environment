@@ -1,4 +1,5 @@
 import * as MarkdownIt from "markdown-it";
+import * as Handlebars from "handlebars";
 import * as vscode from "vscode";
 import { CourseItem, CourseLesson, CourseSubmodule } from "./course-data";
 import { LessonViewProvider } from "./lesson-view-provider";
@@ -13,7 +14,10 @@ const markdownRenderer = new MarkdownIt();
 export class LessonRenderer {
   private currentCourseItemTextDocuments: vscode.TextDocument[] = [];
 
-  constructor(private readonly lessonViewProvider: LessonViewProvider) {}
+  constructor(
+    private readonly lessonViewProvider: LessonViewProvider,
+    private readonly context: vscode.ExtensionContext
+  ) {}
 
   async viewLessonContent(item: CourseItem): Promise<void> {
     // Save all open text editors
@@ -132,9 +136,27 @@ export class LessonRenderer {
   private async renderLessonContent(item: CourseItem): Promise<void> {
     const lessonView = this.lessonViewProvider.getLessonView();
 
+    const headTag = `
+      <head>
+        <link rel="stylesheet" href="${lessonView.webview.asWebviewUri(
+          vscode.Uri.joinPath(
+            this.context.extensionUri,
+            "./assets/styles/base.css"
+          )
+        )}">
+      </head>
+    `;
     if (item instanceof CourseSubmodule) {
       const html = `
         <html>
+          <head>
+            <link rel="stylesheet" href="${lessonView.webview.asWebviewUri(
+              vscode.Uri.joinPath(
+                this.context.extensionUri,
+                "./assets/styles/base.css"
+              )
+            )}">
+          </head>
           <body>
             <nav>
               <a id="prev" href="${vscode.Uri.parse(
@@ -145,11 +167,17 @@ export class LessonRenderer {
               )}">Next</a>
             </nav>
             <h1>${item.data.title}</h1>
+            ${
+              item.data.modules
+                ? `
             <ol>
               ${item.data.modules
-                ?.map((module) => `<li>${module.title}</li>`)
+                .map((module) => `<li>${module.title}</li>`)
                 .join("\n")}
             </ol>
+            `
+                : ""
+            }
           </body>
         </html>
       `;
@@ -166,6 +194,24 @@ export class LessonRenderer {
         if (item.data.contentType === "markdown") {
           const html = `
             <html>
+              <head>
+                <link rel="stylesheet" href="${lessonView.webview.asWebviewUri(
+                  vscode.Uri.joinPath(
+                    this.context.extensionUri,
+                    "./assets/styles/base.css"
+                  )
+                )}">
+                ${
+                  item.data.contentStyles
+                    ? item.data.contentStyles.map(
+                        (style) =>
+                          `<link rel="stylesheet" href="${lessonView.webview.asWebviewUri(
+                            getUriRelativeToCourseItem(item, style)
+                          )}">`
+                      )
+                    : ""
+                }
+              </head>
               <body>
                 <nav>
                   <a id="prev" href="${vscode.Uri.parse(
