@@ -55,6 +55,11 @@
         "command": "integratedLearningEnvironment.goToPreviousCourseItem",
         "title": "Go To Previous Course Item",
         "icon": "$(arrow-left)"
+      },
+      {
+        "command": "integratedLearningEnvironment.resumeCourse",
+        "title": "Resume Course",
+        "icon": "$(arrow-left)"
       }
     ]
   },

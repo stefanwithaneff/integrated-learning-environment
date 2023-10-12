@@ -3,7 +3,12 @@
 import * as vscode from "vscode";
 
 import { CourseDataProvider } from "./course-data-provider";
-import { CourseItem } from "./course-data";
+import {
+  CourseItem,
+  CourseLesson,
+  CourseSubmodule,
+  LessonStatus,
+} from "./course-data";
 import { LessonViewProvider } from "./lesson-view-provider";
 import { LessonRenderer } from "./lesson-renderer";
 import { runTestsForCourseItem } from "./run-tests-for-course-item";
@@ -89,12 +94,45 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const resumeCourseCommand = vscode.commands.registerCommand(
+    "integratedLearningEnvironment.resumeCourse",
+    async () => {
+      const currentSelection = treeView.selection.at(0);
+
+      let nextItem = await getNextCourseItem(
+        courseDataProvider,
+        currentSelection
+      );
+
+      while (true) {
+        if (nextItem instanceof CourseSubmodule) {
+          nextItem = await getNextCourseItem(courseDataProvider, nextItem);
+          continue;
+        }
+        if (nextItem instanceof CourseLesson) {
+          if (nextItem.lessonStatus === LessonStatus.PASSED) {
+            nextItem = await getNextCourseItem(courseDataProvider, nextItem);
+            continue;
+          }
+          break;
+        }
+        nextItem = undefined;
+        break;
+      }
+
+      if (nextItem) {
+        await treeView.reveal(nextItem);
+      }
+    }
+  );
+
   context.subscriptions.push(
     refreshCommand,
     viewCourseItemCommand,
     runCourseItemTestsCommand,
     goToNextCourseItemCommand,
-    goToPreviousCourseItemCommand
+    goToPreviousCourseItemCommand,
+    resumeCourseCommand
   );
 }
 

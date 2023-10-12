@@ -38,7 +38,7 @@ export abstract class CourseItem extends vscode.TreeItem {
   }
 }
 
-enum LessonStatus {
+export enum LessonStatus {
   EMPTY = "EMPTY",
   ERROR = "ERROR",
   PASSED = "PASSED",
