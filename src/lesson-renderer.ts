@@ -222,6 +222,16 @@ export class LessonRenderer {
                   )}">Next</a>
                 </nav>
                 ${markdownRenderer.render(content)}
+                ${
+                  item.data.contentScripts
+                    ? item.data.contentScripts.map(
+                        (script) =>
+                          `<script src="${lessonView.webview.asWebviewUri(
+                            getUriRelativeToCourseItem(item, script)
+                          )}"></script>`
+                      )
+                    : ""
+                }
               </body>
             </html>
           `;
