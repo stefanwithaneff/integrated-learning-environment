@@ -7,6 +7,7 @@ import { CourseItem } from "./course-data";
 import { LessonViewProvider } from "./lesson-view-provider";
 import { LessonRenderer } from "./lesson-renderer";
 import { runTestsForCourseItem } from "./run-tests-for-course-item";
+import { getNextCourseItem, getPreviousCourseItem } from "./tree-traversal";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -56,10 +57,44 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  const goToNextCourseItemCommand = vscode.commands.registerCommand(
+    "integratedLearningEnvironment.goToNextCourseItem",
+    async () => {
+      const currentSelection = treeView.selection.at(0);
+
+      const nextItem = await getNextCourseItem(
+        courseDataProvider,
+        currentSelection
+      );
+
+      if (nextItem) {
+        await treeView.reveal(nextItem);
+      }
+    }
+  );
+
+  const goToPreviousCourseItemCommand = vscode.commands.registerCommand(
+    "integratedLearningEnvironment.goToPreviousCourseItem",
+    async () => {
+      const currentSelection = treeView.selection.at(0);
+
+      const previousItem = await getPreviousCourseItem(
+        courseDataProvider,
+        currentSelection
+      );
+
+      if (previousItem) {
+        await treeView.reveal(previousItem);
+      }
+    }
+  );
+
   context.subscriptions.push(
     refreshCommand,
     viewCourseItemCommand,
-    runCourseItemTestsCommand
+    runCourseItemTestsCommand,
+    goToNextCourseItemCommand,
+    goToPreviousCourseItemCommand
   );
 }
 

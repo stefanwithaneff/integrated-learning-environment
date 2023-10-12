@@ -29,13 +29,6 @@
           "when": "view == integratedLearningEnvironment",
           "group": "navigation"
         }
-      ],
-      "view/item/context": [
-        {
-          "command": "integratedLearningEnvironment.viewCourseItem",
-          "when": "view == integratedLearningEnvironment",
-          "group": "inline"
-        }
       ]
     },
     "commands": [
@@ -51,8 +44,17 @@
       },
       {
         "command": "integratedLearningEnvironment.runCourseItemTests",
-        "title": "Run Course Item Tests",
-        "icon": "$(link-external)"
+        "title": "Run Course Item Tests"
+      },
+      {
+        "command": "integratedLearningEnvironment.goToNextCourseItem",
+        "title": "Go To Next Course Item",
+        "icon": "$(arrow-right)"
+      },
+      {
+        "command": "integratedLearningEnvironment.goToPreviousCourseItem",
+        "title": "Go To Previous Course Item",
+        "icon": "$(arrow-left)"
       }
     ]
   },

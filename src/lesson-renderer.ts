@@ -139,7 +139,7 @@ export class LessonRenderer {
             <h1>${item.data.title}</h1>
             <ol>
               ${item.data.modules
-                .map((module) => `<li>${module.title}</li>`)
+                ?.map((module) => `<li>${module.title}</li>`)
                 .join("\n")}
             </ol>
           </body>

@@ -22,7 +22,7 @@ type ElementConfig = LessonConfig | SubmoduleConfig;
 
 export interface CourseModule {
   title: string;
-  modules: ElementConfig[];
+  modules?: ElementConfig[];
   testCommand?: string;
 }
 
