@@ -14,11 +14,24 @@
   ],
   "main": "./dist/extension.js",
   "contributes": {
-    "views": {
-      "explorer": [
+    "viewsContainers": {
+      "activitybar": [
         {
-          "id": "integratedLearningEnvironment",
-          "name": "Integrated Learning Environment"
+          "id": "integrated-learning-environment",
+          "title": "Integrated Learning Environment",
+          "icon": "assets/media/cap.svg"
+        }
+      ]
+    },
+    "views": {
+      "integrated-learning-environment": [
+        {
+          "id": "integratedLearningEnvironment.learning-modules-view",
+          "name": "Learning Modules"
+        },
+        {
+          "id": "integratedLearningEnvironment.exercise-files-view",
+          "name": "Files"
         }
       ]
     },

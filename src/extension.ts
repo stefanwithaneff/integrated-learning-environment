@@ -13,6 +13,7 @@ import { LessonViewProvider } from "./lesson-view-provider";
 import { LessonRenderer } from "./lesson-renderer";
 import { runTestsForCourseItem } from "./run-tests-for-course-item";
 import { getNextCourseItem, getPreviousCourseItem } from "./tree-traversal";
+import { ExerciseFileProvider } from "./exercise-file-provider";
 
 // this method is called when your extension is activated
 // your extension is activated the very first time the command is executed
@@ -24,24 +25,39 @@ export function activate(context: vscode.ExtensionContext) {
   const lessonViewProvider = new LessonViewProvider();
   const lessonRenderer = new LessonRenderer(lessonViewProvider, context);
 
-  const treeView = vscode.window.createTreeView(
-    "integratedLearningEnvironment",
+  const learningModulesTreeView = vscode.window.createTreeView(
+    "integratedLearningEnvironment.learning-modules-view",
     {
       treeDataProvider: courseDataProvider,
       canSelectMany: false,
     }
   );
 
-  treeView.onDidChangeSelection((event) => {
+  const exerciseFileProvider = new ExerciseFileProvider(
+    learningModulesTreeView
+  );
+
+  const exerciseFileTreeView = vscode.window.createTreeView(
+    "integratedLearningEnvironment.exercise-files-view",
+    {
+      treeDataProvider: exerciseFileProvider,
+    }
+  );
+
+  learningModulesTreeView.onDidChangeSelection(async (event) => {
     if (event.selection.length === 0) {
       return;
     }
-    lessonRenderer.viewLessonContent(event.selection[0]);
+    exerciseFileProvider.refresh();
+    await lessonRenderer.viewLessonContent(event.selection[0]);
   });
 
   const refreshCommand = vscode.commands.registerCommand(
     "integratedLearningEnvironment.refreshData",
-    () => courseDataProvider.refresh()
+    () => {
+      courseDataProvider.refresh();
+      exerciseFileProvider.refresh();
+    }
   );
 
   const viewCourseItemCommand = vscode.commands.registerCommand(
@@ -54,7 +70,7 @@ export function activate(context: vscode.ExtensionContext) {
   const runCourseItemTestsCommand = vscode.commands.registerCommand(
     "integratedLearningEnvironment.runCourseItemTests",
     async () => {
-      const currentCourseItem = treeView.selection[0];
+      const currentCourseItem = learningModulesTreeView.selection[0];
       await runTestsForCourseItem(context, currentCourseItem);
 
       // Refresh course data provider to pick up new test status
@@ -65,7 +81,7 @@ export function activate(context: vscode.ExtensionContext) {
   const goToNextCourseItemCommand = vscode.commands.registerCommand(
     "integratedLearningEnvironment.goToNextCourseItem",
     async () => {
-      const currentSelection = treeView.selection.at(0);
+      const currentSelection = learningModulesTreeView.selection.at(0);
 
       const nextItem = await getNextCourseItem(
         courseDataProvider,
@@ -73,7 +89,7 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       if (nextItem) {
-        await treeView.reveal(nextItem);
+        await learningModulesTreeView.reveal(nextItem);
       }
     }
   );
@@ -81,7 +97,7 @@ export function activate(context: vscode.ExtensionContext) {
   const goToPreviousCourseItemCommand = vscode.commands.registerCommand(
     "integratedLearningEnvironment.goToPreviousCourseItem",
     async () => {
-      const currentSelection = treeView.selection.at(0);
+      const currentSelection = learningModulesTreeView.selection.at(0);
 
       const previousItem = await getPreviousCourseItem(
         courseDataProvider,
@@ -89,7 +105,7 @@ export function activate(context: vscode.ExtensionContext) {
       );
 
       if (previousItem) {
-        await treeView.reveal(previousItem);
+        await learningModulesTreeView.reveal(previousItem);
       }
     }
   );
@@ -97,7 +113,7 @@ export function activate(context: vscode.ExtensionContext) {
   const resumeCourseCommand = vscode.commands.registerCommand(
     "integratedLearningEnvironment.resumeCourse",
     async () => {
-      const currentSelection = treeView.selection.at(0);
+      const currentSelection = learningModulesTreeView.selection.at(0);
 
       let nextItem = await getNextCourseItem(
         courseDataProvider,
@@ -121,7 +137,7 @@ export function activate(context: vscode.ExtensionContext) {
       }
 
       if (nextItem) {
-        await treeView.reveal(nextItem);
+        await learningModulesTreeView.reveal(nextItem);
       }
     }
   );
