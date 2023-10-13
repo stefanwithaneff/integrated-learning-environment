@@ -1,5 +1,4 @@
 import * as MarkdownIt from "markdown-it";
-import * as Handlebars from "handlebars";
 import * as vscode from "vscode";
 import { CourseItem, CourseLesson, CourseSubmodule } from "./course-data";
 import { LessonViewProvider } from "./lesson-view-provider";
@@ -18,6 +17,10 @@ export class LessonRenderer {
     private readonly lessonViewProvider: LessonViewProvider,
     private readonly context: vscode.ExtensionContext
   ) {}
+
+  public getCurrentCourseItemTextDocuments(): vscode.TextDocument[] {
+    return this.currentCourseItemTextDocuments;
+  }
 
   async viewLessonContent(item: CourseItem): Promise<void> {
     // Save all open text editors

@@ -44,6 +44,20 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
+  exerciseFileTreeView.onDidChangeSelection(async (event) => {
+    const selection = event.selection.at(0);
+    if (!selection || selection.type === "directory") {
+      return;
+    }
+
+    const textDocument = await vscode.workspace.openTextDocument(selection.uri);
+    return vscode.window.showTextDocument(textDocument, {
+      preview: false, // Prevents the individual files from overriding each other
+      preserveFocus: false,
+      viewColumn: vscode.ViewColumn.One,
+    });
+  });
+
   learningModulesTreeView.onDidChangeSelection(async (event) => {
     if (event.selection.length === 0) {
       return;
