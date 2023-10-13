@@ -22,9 +22,6 @@ export function activate(context: vscode.ExtensionContext) {
     vscode.workspace.workspaceFolders || []
   );
 
-  const lessonViewProvider = new LessonViewProvider();
-  const lessonRenderer = new LessonRenderer(lessonViewProvider, context);
-
   const learningModulesTreeView = vscode.window.createTreeView(
     "integratedLearningEnvironment.learning-modules-view",
     {
@@ -43,6 +40,12 @@ export function activate(context: vscode.ExtensionContext) {
       treeDataProvider: exerciseFileProvider,
     }
   );
+
+  const lessonViewProvider = new LessonViewProvider(
+    context,
+    learningModulesTreeView
+  );
+  const lessonRenderer = new LessonRenderer(lessonViewProvider, context);
 
   exerciseFileTreeView.onDidChangeSelection(async (event) => {
     const selection = event.selection.at(0);
